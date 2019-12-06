@@ -1,6 +1,5 @@
 package eu.tjago;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.OptionalInt;
 
@@ -11,7 +10,6 @@ public class Day1 {
 
     void Solution() {
         List<String> inputs = Common.getStringArraysOutOfFile("res/Day1Data1.txt");
-//        inputs.stream().forEach(System.out::println);
 
         OptionalInt result = inputs.stream()
                 .map(Integer::parseInt)
