@@ -7,8 +7,8 @@ import java.util.stream.IntStream;
 
 public class Day4 {
 
-    static Integer inputMin = 254032;
-    static Integer inputMax = 789860;
+    static int inputMin = 254032;
+    static int inputMax = 789860;
 
     public static void main(String[] args) {
         new Day4().solution();
@@ -22,21 +22,20 @@ public class Day4 {
     }
 
     static boolean checkIfNumHasPairsAndIsNotDecreasing(Integer number) {
-        List<Long> numberList = number.toString().chars()
-                .mapToLong(value -> 48 - Character.getNumericValue(value)).boxed().collect(Collectors.toList());
+        List<Integer> numberList = number.toString().chars()
+                .map(Character::getNumericValue).boxed().collect(Collectors.toList());
 
-        long numberOfAdjacentSameNumberPairs = numberList.stream()
-                .filter(val -> checkIfNextValIsSame(val, numberList)).count();
+        Integer prev = -1;
+        boolean adjacentPair = false;
+        for(Integer num : numberList) {
+            if (num.equals(prev)) adjacentPair = true;
+            prev = num;
+        }
 
-        long numberOfDecreasingNumbers = numberList.stream()
-                .filter(val -> checkIfNextNumberIsDecreasing(val, numberList)).count();
+        //I check if list can be sorted if sorted then it's not in increasing order
+        List<Integer> sortedList = numberList.stream().sorted().collect(Collectors.toList());
 
-        return numberOfAdjacentSameNumberPairs > 0 && numberOfDecreasingNumbers == 0;
-    }
-
-    private static boolean checkIfNextNumberIsDecreasing(Long val, List<Long> numberList) {
-        ListIterator<Long> iterator = numberList.listIterator(numberList.indexOf(val));
-        return val < iterator.next();
+        return sortedList.equals(numberList) && adjacentPair;
     }
 
     static boolean checkIfNextValIsSame(Long val, List<Long> numList) {
