@@ -25,11 +25,12 @@ public class Day4 {
         List<Integer> numberList = number.toString().chars()
                 .map(Character::getNumericValue).boxed().collect(Collectors.toList());
 
-        Integer prev = -1;
         boolean adjacentPair = false;
         for(Integer num : numberList) {
-            if (num.equals(prev)) adjacentPair = true;
-            prev = num;
+            if (number.toString().contains(num.toString() + num.toString()) &&
+                    !number.toString().contains(num.toString() + num.toString() + num.toString())) { //Part 2 condition
+                adjacentPair = true;
+            }
         }
 
         //I check if list can be sorted if sorted then it's not in increasing order
