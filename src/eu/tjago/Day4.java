@@ -38,9 +38,4 @@ public class Day4 {
 
         return sortedList.equals(numberList) && adjacentPair;
     }
-
-    static boolean checkIfNextValIsSame(Long val, List<Long> numList) {
-        ListIterator<Long> iterator = numList.listIterator(numList.indexOf(val));
-        return val.equals(iterator.next());
-    }
 }
