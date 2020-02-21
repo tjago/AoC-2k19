@@ -1,6 +1,7 @@
 package eu.tjago;
 
-import java.util.Arrays;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -88,13 +89,13 @@ public class Day3 {
         populateGrid(wire1PathSteps);
         populateGrid(wire2PathSteps);
 
-        long wiresPathCount = IntStream.rangeClosed(0, 10_000).mapToLong(
-                x -> IntStream.rangeClosed(0, 10_000).filter(
-                        y -> grid[x][y] == 1
-                ).count()
-        ).sum();
+//        long wiresPathCount = IntStream.rangeClosed(0, 10_000).mapToLong(
+//                x -> IntStream.rangeClosed(0, 10_000).filter(
+//                        y -> grid[x][y] == 1
+//                ).count()
+//        ).sum();
 
-        System.out.println(wiresPathCount);
+//        System.out.println(wiresPathCount);
     }
 
     private void populateGrid(List<String> wirePathSteps) {
@@ -104,26 +105,29 @@ public class Day3 {
 
         GridCursor gc = new GridCursor(5_000, 5_000);
 
+        LinkedList<Point> path1Points = new LinkedList<>();
+        path1Points.add(new Point(0,0));
+
+        int cursorX = 0, cursorY = 0;
+
         pathSteps.forEach(step -> {
-            System.out.println("processing step: " + step);
+            Point prevPoint = path1Points.getLast();
                     switch (step.direction) {
                         case UP:
-                            IntStream.rangeClosed(1, step.stepsDistance)
-                                    .forEach(value -> grid[ gc.getCursorX() ][ gc.incCursorY() ]++);
+                            path1Points.addLast(new Point(prevPoint.x, prevPoint.y + step.stepsDistance));
                             break;
                         case DOWN:
-                            IntStream.rangeClosed(1, step.stepsDistance)
-                                    .forEach(value -> grid[ gc.getCursorX() ][ gc.decCursorY() ]++);
+                            path1Points.addLast(new Point(prevPoint.x, prevPoint.y - step.stepsDistance));
                             break;
                         case LEFT:
-                            IntStream.rangeClosed(1, step.stepsDistance)
-                                    .forEach(value -> grid[ gc.decCursorX() ][ gc.getCursorY() ]++);
+                            path1Points.addLast(new Point(prevPoint.x - step.stepsDistance, prevPoint.y));
                             break;
                         case RIGHT:
-                            IntStream.rangeClosed(1, step.stepsDistance)
-                                    .forEach(value -> grid[ gc.incCursorX() ][ gc.getCursorY() ]++);
+                            path1Points.addLast(new Point(prevPoint.x + step.stepsDistance, prevPoint.y));
                             break;
                     }
                 });
+
+        System.out.println(path1Points);
     }
 }
