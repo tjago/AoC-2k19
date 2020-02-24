@@ -1,10 +1,13 @@
 package eu.tjago;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class Day3 {
     public static void main(String[] args) {
@@ -86,8 +89,17 @@ public class Day3 {
                 Arrays.asList(Common.getStringArraysOutOfFile("res/Day3Data1.txt")
                         .get(1).split(","));
 
-        populateGrid(wire1PathSteps);
-        populateGrid(wire2PathSteps);
+        LinkedList<Point> path1Points = populateGrid(wire1PathSteps);
+        LinkedList<Point> path2Points = populateGrid(wire2PathSteps);
+
+
+        IntStream.range(0, path1Points.size() - 1).forEach(
+                value -> IntStream.range(0, path2Points.size() - 1).filter(
+                        value1 -> linesIntersect(path1Points.get(value), path1Points.get(value +1),
+                                path2Points.get(value1), path2Points.get(value1 +1))
+                ).peek(System.out::println)
+        );
+
 
 //        long wiresPathCount = IntStream.rangeClosed(0, 10_000).mapToLong(
 //                x -> IntStream.rangeClosed(0, 10_000).filter(
@@ -98,7 +110,11 @@ public class Day3 {
 //        System.out.println(wiresPathCount);
     }
 
-    private void populateGrid(List<String> wirePathSteps) {
+    boolean linesIntersect(Point a, Point b, Point c, Point d) {
+        return Line2D.linesIntersect(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
+    }
+
+    private LinkedList<Point> populateGrid(List<String> wirePathSteps) {
 
         List<Step> pathSteps = wirePathSteps.stream()
                 .map(Step::new).collect(Collectors.toList());
@@ -128,6 +144,6 @@ public class Day3 {
                     }
                 });
 
-        System.out.println(path1Points);
+        return path1Points;
     }
 }
