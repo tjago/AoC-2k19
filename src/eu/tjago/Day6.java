@@ -1,6 +1,7 @@
 package eu.tjago;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class Day6 {
@@ -19,10 +20,32 @@ public class Day6 {
                     if (orbits.get(orbs[0]) != null) {
                         orbits.get(orbs[0]).add(orbs[1]);
                     } else {
-                        orbits.put(orbs[0], new ArrayList<>());
+                        List<String> orbitArray = new ArrayList<>();
+                        orbitArray.add(orbs[1]);
+                        orbits.put(orbs[0], orbitArray);
                     }
                 }
         );
-        System.out.println(orbits);
+//                orbits.forEach((s, strings) -> System.out.println("key: " + s + " list: " + strings));
+
+        AtomicInteger counter = new AtomicInteger();
+        orbits.forEach((s, strings) -> {
+            counter.addAndGet(countOrbitsOf(s,orbits));
+        });
+
+        System.out.println("All orbits of objects = " + counter);
     }
+
+    int countOrbitsOf(String currentObject, Map<String, List<String>> orbits) {
+        if (orbits.get(currentObject) == null) {
+            return 0;
+        } else {
+            int count = 0;
+            for (String object : orbits.get(currentObject)) {
+                count += 1 + countOrbitsOf(object, orbits);
+            }
+            return count;
+        }
+    }
+
 }
