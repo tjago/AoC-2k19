@@ -26,7 +26,6 @@ public class Day6 {
                     }
                 }
         );
-//                orbits.forEach((s, strings) -> System.out.println("key: " + s + " list: " + strings));
 
         AtomicInteger counter = new AtomicInteger();
         orbits.forEach((s, strings) -> {
@@ -83,10 +82,6 @@ public class Day6 {
         public Distance(boolean found, int dist) {
             this.found = found;
             this.dist = dist;
-        }
-
-        private void incrementBy(int val) {
-            dist+= val;
         }
 
         public boolean isFound() {
