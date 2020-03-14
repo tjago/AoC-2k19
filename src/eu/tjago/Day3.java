@@ -12,7 +12,7 @@ public class Day3 {
         new Day3().solution();
     }
 
-    enum Direction { LEFT, RIGHT, UP, DOWN}
+    enum Direction { LEFT, RIGHT, UP, DOWN }
 
     class LinePair {
         Line one, two;
@@ -32,6 +32,9 @@ public class Day3 {
         }
 
         boolean intersects(Line other) {
+            if (this.A.equals(other.A) || this.A.equals(other.B) || this.B.equals(other.A) || this.B.equals(other.B)) {
+                return false;
+            }
             return Line2D.linesIntersect(this.A.x, this.A.y, this.B.x, this.B.y,
                     other.A.x, other.A.y, other.B.x, other.B.y);
         }
@@ -86,7 +89,13 @@ public class Day3 {
                         }
                 )
         );
-        System.out.println("Shortest distance for intersecting wires: ");
+
+        Point point = getClosestIntersectionDistanceToOrigin(intersectingLines);
+        System.out.println("Shortest distance for intersecting wires: " + intersectingLines.size());
+    }
+
+    private Point getClosestIntersectionDistanceToOrigin(List<LinePair> intersectingLines) {
+        return null;
     }
 
     private OptionalInt shortestManhattanDistance(List<Point> intersectionPoints) {
@@ -96,12 +105,6 @@ public class Day3 {
                .mapToInt(p -> Math.abs(p.x) + Math.abs(p.y))
                .min();
 
-    }
-
-    boolean linesIntersect(Point a, Point b, Point c, Point d) {
-
-
-        return Line2D.linesIntersect(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
     }
 
     private List<Line> createLines(List<String> wirePathSteps) {
@@ -135,7 +138,7 @@ public class Day3 {
 
         return IntStream
                 .range(0, pathSteps.size() -1)
-                .mapToObj(val -> new Line(points.get(0), points.get(+1)))
+                .mapToObj(val -> new Line(points.get(val), points.get(val + 1)))
                 .collect(Collectors.toList());
     }
 }
