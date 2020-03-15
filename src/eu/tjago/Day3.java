@@ -14,10 +14,10 @@ public class Day3 {
 
     enum Direction { LEFT, RIGHT, UP, DOWN }
 
-    class LinePair {
+    class SegmentPair {
         Line one, two;
 
-        LinePair(Line a, Line b) {
+        SegmentPair(Line a, Line b) {
             this.one = a;
             this.two = b;
         }
@@ -78,24 +78,37 @@ public class Day3 {
         List<Line> path1Lines = createLines(wire1PathSteps);
         List<Line> path2Lines = createLines(wire2PathSteps);
 
-        List<LinePair> intersectingLines = new ArrayList<>();
+        List<SegmentPair> intersectingLines = new ArrayList<>();
 
         IntStream.range(0, path1Lines.size() - 1).forEach(
                 value -> IntStream.range(0, path2Lines.size() - 1).forEach(
                         value1 -> {
                             if (path1Lines.get(value).intersects(path2Lines.get(value1))) {
-                                intersectingLines.add(new LinePair(path1Lines.get(value), path2Lines.get(value1)));
+                                intersectingLines.add(new SegmentPair(path1Lines.get(value), path2Lines.get(value1)));
                             }
                         }
                 )
         );
 
-        Point point = getClosestIntersectionDistanceToOrigin(intersectingLines);
-        System.out.println("Shortest distance for intersecting wires: " + intersectingLines.size());
+        List<Point> intersectionPoints = getClosestIntersectionDistanceToOrigin(intersectingLines);
+        OptionalInt result = shortestManhattanDistance(intersectionPoints);
+
+        System.out.println("Shortest distance for intersecting wires: "
+                + ((result.isPresent()) ? result.getAsInt() : " no intersection found"));
     }
 
-    private Point getClosestIntersectionDistanceToOrigin(List<LinePair> intersectingLines) {
-        return null;
+    private List<Point> getClosestIntersectionDistanceToOrigin(List<SegmentPair> intersectingLines) {
+        return intersectingLines.stream()
+                .map(this::findIntersectionPoint)
+                .collect(Collectors.toList());
+    }
+
+    //Only works with perpendicular segments!
+    private Point findIntersectionPoint(SegmentPair segmentPair) {
+        int x = (segmentPair.one.A.x == segmentPair.one.B.x) ? segmentPair.one.A.x : segmentPair.two.A.x;
+        int y = (segmentPair.one.A.y == segmentPair.one.B.y) ? segmentPair.one.A.y : segmentPair.two.A.y;
+
+        return new Point(x, y);
     }
 
     private OptionalInt shortestManhattanDistance(List<Point> intersectionPoints) {
