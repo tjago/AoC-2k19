@@ -15,23 +15,33 @@ public class Day3 {
     enum Direction { LEFT, RIGHT, UP, DOWN }
 
     class SegmentPair {
-        Line one, two;
+        Segment one, two;
 
-        SegmentPair(Line a, Line b) {
+        SegmentPair(Segment a, Segment b) {
             this.one = a;
             this.two = b;
         }
     }
 
-    class Line {
+    class Segment {
         Point A, B;
+        Segment previous; //ref to obj
 
-        public Line(Point a, Point b) {
+        Segment(Point a, Point b) {
             A = a;
             B = b;
         }
 
-        boolean intersects(Line other) {
+        int length() {
+            if (A.x == B.x) {
+                return Math.abs(A.y - B.y);
+            } else {
+
+                return Math.abs(A.x - B.x);
+            }
+        }
+
+        boolean intersects(Segment other) {
             if (this.A.equals(other.A) || this.A.equals(other.B) || this.B.equals(other.A) || this.B.equals(other.B)) {
                 return false;
             }
@@ -75,26 +85,39 @@ public class Day3 {
                 Arrays.asList(Common.getStringArraysOutOfFile("res/Day3Data1.txt")
                         .get(1).split(","));
 
-        List<Line> path1Lines = createLines(wire1PathSteps);
-        List<Line> path2Lines = createLines(wire2PathSteps);
+        List<Segment> path1Segments = createSegments(wire1PathSteps);
+        List<Segment> path2Segments = createSegments(wire2PathSteps);
 
-        List<SegmentPair> intersectingLines = new ArrayList<>();
+        List<SegmentPair> intersectingSegments =
+                path1Segments
+                        .stream()
+                        .flatMap(Segment1 -> path2Segments
+                                .stream()
+                                .map(Segment2 -> this.checkAndCreateIntersectingSegmentPair(Segment1, Segment2))
+                                .filter(Optional::isPresent)
+                                .map(Optional::get))
+                        .collect(Collectors.toList());
 
-        IntStream.range(0, path1Lines.size() - 1).forEach(
-                value -> IntStream.range(0, path2Lines.size() - 1).forEach(
-                        value1 -> {
-                            if (path1Lines.get(value).intersects(path2Lines.get(value1))) {
-                                intersectingLines.add(new SegmentPair(path1Lines.get(value), path2Lines.get(value1)));
-                            }
-                        }
-                )
-        );
-
-        List<Point> intersectionPoints = getClosestIntersectionDistanceToOrigin(intersectingLines);
+        //Part 1 Solution
+        List<Point> intersectionPoints = getClosestIntersectionDistanceToOrigin(intersectingSegments);
         OptionalInt result = shortestManhattanDistance(intersectionPoints);
 
         System.out.println("Shortest distance for intersecting wires: "
                 + ((result.isPresent()) ? result.getAsInt() : " no intersection found"));
+
+        //Part 2 Solution
+        result = intersectingSegments
+                .stream()
+                .mapToInt(this::getTotalDistance)
+                .min();
+    }
+
+    private Optional<SegmentPair> checkAndCreateIntersectingSegmentPair(Segment A, Segment B) {
+        return A.intersects(B) ? Optional.of(new SegmentPair(A, B)) : Optional.empty();
+    }
+
+    private int getTotalDistance(SegmentPair intersectingSegments) {
+        return 8;
     }
 
     private List<Point> getClosestIntersectionDistanceToOrigin(List<SegmentPair> intersectingLines) {
@@ -120,7 +143,7 @@ public class Day3 {
 
     }
 
-    private List<Line> createLines(List<String> wirePathSteps) {
+    private List<Segment> createSegments(List<String> wirePathSteps) {
 
         List<Step> pathSteps = wirePathSteps
                 .stream()
@@ -148,10 +171,9 @@ public class Day3 {
                     }
                 });
 
-
         return IntStream
                 .range(0, pathSteps.size() -1)
-                .mapToObj(val -> new Line(points.get(val), points.get(val + 1)))
+                .mapToObj(val -> new Segment(points.get(val), points.get(val + 1)))
                 .collect(Collectors.toList());
     }
 }
