@@ -5,7 +5,6 @@ import java.awt.geom.Line2D;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Day3 {
     public static void main(String[] args) {
@@ -25,7 +24,6 @@ public class Day3 {
 
     class Segment {
         Point A, B;
-        Segment previous; //ref to obj
 
         Segment(Point a, Point b) {
             A = a;
@@ -38,6 +36,15 @@ public class Day3 {
             } else {
 
                 return Math.abs(A.x - B.x);
+            }
+        }
+
+        int lengthToPoint(Point p) {
+            if (A.x == p.x) {
+                return Math.abs(A.y - p.y);
+            } else {
+
+                return Math.abs(A.x - p.x);
             }
         }
 
@@ -108,16 +115,33 @@ public class Day3 {
         //Part 2 Solution
         result = intersectingSegments
                 .stream()
-                .mapToInt(this::getTotalDistance)
+                .mapToInt(spair -> getTotalDistance(spair, path1Segments, path2Segments))
+                .peek(System.out::println)
                 .min();
+
+        System.out.println("Intersection with lowest number of steps: "
+                + ((result.isPresent()) ? result.getAsInt() : " no intersection found"));
     }
 
     private Optional<SegmentPair> checkAndCreateIntersectingSegmentPair(Segment A, Segment B) {
         return A.intersects(B) ? Optional.of(new SegmentPair(A, B)) : Optional.empty();
     }
 
-    private int getTotalDistance(SegmentPair intersectingSegments) {
-        return 8;
+    private int getTotalDistance(SegmentPair intersectingSegments, List<Segment> segments1, List<Segment> segments2) {
+
+        Point point = findIntersectionPoint(intersectingSegments);
+
+        return    intersectingSegments.one.lengthToPoint(point)
+                + intersectingSegments.two.lengthToPoint(point)
+                + sumOfSegmentsPriorSegment(segments1, intersectingSegments.one)
+                + sumOfSegmentsPriorSegment(segments2, intersectingSegments.two);
+    }
+
+    private int sumOfSegmentsPriorSegment(List<Segment> segmentList, Segment segment){
+        return segmentList.subList(0, segmentList.indexOf(segment))
+                .stream()
+                .mapToInt(Segment::length)
+                .sum();
     }
 
     private List<Point> getClosestIntersectionDistanceToOrigin(List<SegmentPair> intersectingLines) {
@@ -171,9 +195,11 @@ public class Day3 {
                     }
                 });
 
-        return IntStream
-                .range(0, pathSteps.size() -1)
-                .mapToObj(val -> new Segment(points.get(val), points.get(val + 1)))
+        Iterator<Point> iter = points.stream().iterator();
+        return points
+                .stream()
+                .skip(1)
+                .map(point -> new Segment(iter.next(), point))
                 .collect(Collectors.toList());
     }
 }
